@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Promptoon — Karya & Prompt AI</title>
+  <meta name="description" content="Promptoon — animasi AI & library prompt. Dari prompt jadi kartun." />
+  
+  <!-- Font Modern: Outfit untuk headings (Playful) & Inter untuk body (Readable) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ========= Variables (Extracted from your Images) ========== */
+    :root {
+      /* Palette: Deep Indigo BG, Cyan & Pink Accents from the Robot */
+      --bg-deep: #0f0c1a; /* Dark Violet/Black base */
+      --bg-surface: #1a162e; /* Slightly lighter violet */
+      
+      --accent-cyan: #00e5ff;
+      --accent-pink: #ff4ea4;
+      --accent-yellow: #ffde59;
+      --accent-gradient: linear-gradient(135deg, var(--accent-cyan), var(--accent-pink));
+      
+      --text-main: #ffffff;
+      --text-muted: #948fac;
+      
+      --glass: rgba(255, 255, 255, 0.05);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-blur: 12px;
+      
+      --radius-lg: 24px;
+      --radius-md: 16px;
+      --radius-sm: 10px;
+      
+      --nav-h: 80px;
+      --transition: 300ms cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    /* Light Theme Override (Optional, Soft Pastel) */
+    html.light {
+      --bg-deep: #f8f9ff;
+      --bg-surface: #ffffff;
+      --text-main: #1a162e;
+      --text-muted: #64748b;
+      --glass: rgba(255, 255, 255, 0.6);
+      --glass-border: rgba(0, 0, 0, 0.05);
+    }
+
+    /* ====== Base Reset ====== */
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-deep);
+      color: var(--text-main);
+      /* Mesh Gradient Background inspired by your cover art */
+      background-image: 
+        radial-gradient(circle at 10% 0%, rgba(0, 229, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 10%, rgba(255, 78, 164, 0.12) 0%, transparent 40%);
+      background-attachment: fixed;
+      transition: background var(--transition), color var(--transition);
+      padding-bottom: 100px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, .btn { font-family: 'Outfit', sans-serif; }
+
+    /* ====== Utility Classes ====== */
+    .container {
+      width: 92%;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    /* ====== Sticky Nav (Floating Glass) ====== */
+    .nav-wrapper {
+      position: sticky;
+      top: 20px;
+      z-index: 100;
+      padding: 0 20px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .nav {
+      width: 100%;
+      max-width: 1200px;
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      
+      /* Glassmorphism */
+      background: rgba(26, 22, 46, 0.7);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 0 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    /* Logo styled like the Robot Icon */
+    .logo-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 24px;
+      color: white;
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+      transform: rotate(-3deg);
+      transition: var(--transition);
+    }
+    .brand:hover .logo-box { transform: rotate(0deg) scale(1.1); }
+    
+    .brand-text h1 { margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.5px; }
+    .brand-text span { font-size: 12px; color: var(--accent-pink); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Desktop Menu */
+    .nav-links {
+      display: flex;
+      gap: 8px;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      background: rgba(0,0,0,0.2);
+      padding: 6px;
+      border-radius: 99px;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      padding: 10px 20px;
+      border-radius: 99px;
+      transition: var(--transition);
+    }
+    .nav-links a:hover, .nav-links a.active {
+      background: var(--bg-surface);
+      color: var(--text-main);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .nav-actions { display: flex; gap: 12px; align-items: center; }
+
+    /* ====== Buttons ====== */
+    .btn {
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      border: none;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn:active { transform: scale(0.96); }
+
+    .btn.primary {
+      background: var(--accent-gradient);
+      color: white;
+      box-shadow: 0 8px 20px rgba(255, 78, 164, 0.3);
+    }
+    .btn.primary:hover {
+      box-shadow: 0 12px 30px rgba(0, 229, 255, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      color: var(--text-main);
+      border: 1px solid var(--glass-border);
+    }
+    .btn.ghost:hover {
+      border-color: var(--accent-cyan);
+      background: rgba(0, 229, 255, 0.05);
+    }
+
+    .btn-icon {
+      width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+    }
+
+    /* ====== Hero Section (Cover Image Style) ====== */
+    .hero {
+      margin-top: 60px;
+      margin-bottom: 80px;
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 40px;
+      align-items: center;
+    }
+    
+    .hero-content h2 {
+      font-size: 56px;
+      line-height: 1.1;
+      margin: 0 0 20px 0;
+      background: linear-gradient(to right, #fff, #b4b4b4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-content .highlight {
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    .hero-content p {
+      font-size: 18px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 30px;
+      max-width: 90%;
+    }
+
+    /* Visual Placeholder for where your Cover Image would go */
+    .hero-visual {
+      position: relative;
+    }
+    .cover-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 10px;
+      transform: rotate(3deg);
+      transition: var(--transition);
+      box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+    }
+    .cover-card:hover { transform: rotate(0deg) scale(1.02); }
+    
+    .cover-img {
+      width: 100%;
+      height: auto;
+      border-radius: 14px;
+      display: block;
+      /* Using a gradient placeholder until you upload your image */
+      background: linear-gradient(135deg, #1a162e, #2d2645);
+      min-height: 300px;
+      object-fit: cover;
+    }
+
+    /* Floating badges for decoration */
+    .float-badge {
+      position: absolute;
+      background: var(--bg-surface);
+      border: 1px solid var(--glass-border);
+      padding: 10px 16px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--text-main);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      animation: float 4s ease-in-out infinite;
+    }
+    .fb-1 { top: -20px; left: -20px; animation-delay: 0s; }
+    .fb-2 { bottom: 40px; right: -30px; animation-delay: 2s; }
+    
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+    /* ====== Section Titles ====== */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      margin-bottom: 30px;
+    }
+    .section-title {
+      font-size: 32px;
+      margin: 0;
+    }
+    .section-subtitle {
+      color: var(--accent-pink);
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    /* ====== Card Grid ====== */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border-radius: var(--radius-lg);
+      padding: 12px;
+      border: 1px solid var(--glass-border);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      border-color: rgba(255, 78, 164, 0.3);
+    }
+    
+    /* Image container */
+    .card-img-box {
+      position: relative;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      aspect-ratio: 16/10;
+    }
+    
+    .card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .card:hover .card-img { transform: scale(1.1); }
+
+    .card-body {
+      padding: 16px 8px 8px 8px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .card-title { font-size: 18px; margin: 0 0 6px 0; color: white; }
+    .card-desc { font-size: 14px; color: var(--text-muted); margin: 0 0 16px 0; line-height: 1.5; flex-grow: 1; }
+
+    /* Prompt Preview (Code block style) */
+    .prompt-preview {
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      padding: 10px;
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      font-size: 12px;
+      color: #a8b3c7;
+      margin-bottom: 16px;
+      border: 1px dashed var(--glass-border);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: help;
+    }
+    .prompt-preview:hover { color: var(--accent-cyan); border-color: var(--accent-cyan); }
+
+    .card-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .btn-sm {
+      padding: 8px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-accent { background: rgba(0, 229, 255, 0.1); color: var(--accent-cyan); }
+    .btn-accent:hover { background: var(--accent-cyan); color: #000; }
+    
+    .btn-outline { background: transparent; border: 1px solid var(--glass-border); color: var(--text-muted); }
+    .btn-outline:hover { border-color: white; color: white; }
+
+    /* ====== Profile Section (About) ====== */
+    .about-card {
+      background: linear-gradient(180deg, var(--bg-surface) 0%, rgba(26,22,46,0.5) 100%);
+      border-radius: 32px;
+      padding: 40px;
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      gap: 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    /* Background decoration */
+    .about-bg {
+      position: absolute;
+      top: -50%; right: -20%;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.1) 0%, transparent 70%);
+      filter: blur(60px);
+      z-index: 0;
+    }
+
+    .profile-img-container {
+      position: relative;
+      z-index: 1;
+      width: 160px;
+      height: 160px;
+      flex-shrink: 0;
+    }
+    
+    /* Styles for your round profile picture */
+    .profile-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 4px solid var(--bg-deep);
+      outline: 4px solid var(--accent-pink);
+      object-fit: cover;
+      background: #ddd;
+    }
+    
+    .profile-star {
+      position: absolute;
+      top: 0; right: 10px;
+      font-size: 24px;
+      background: var(--accent-yellow);
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 50%;
+      border: 4px solid var(--bg-deep);
+      color: #000;
+    }
+
+    .about-content { z-index: 1; max-width: 600px; }
+    .social-links { display: flex; gap: 10px; margin-top: 20px; }
+    .social-pill {
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50px;
+      color: white;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      transition: 0.2s;
+      border: 1px solid transparent;
+    }
+    .social-pill:hover {
+      background: var(--bg-deep);
+      border-color: var(--accent-pink);
+      color: var(--accent-pink);
+    }
+
+    /* ====== Contact Form ====== */
+    .form-group { margin-bottom: 16px; }
+    .input-field {
+      width: 100%;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--glass-border);
+      padding: 14px;
+      border-radius: var(--radius-md);
+      color: white;
+      font-family: inherit;
+      outline: none;
+      transition: 0.3s;
+    }
+    .input-field:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 4px rgba(0, 229, 255, 0.1);
+      background: rgba(0,0,0,0.4);
+    }
+
+    /* ====== Modal ====== */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(15, 12, 26, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .modal-backdrop.open { opacity: 1; }
+    
+    .modal-content {
+      background: var(--bg-surface);
+      width: 90%;
+      max-width: 700px;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--glass-border);
+      padding: 24px;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .modal-backdrop.open .modal-content { transform: scale(1); }
+
+    .prompt-display {
+      background: #0a0812;
+      padding: 20px;
+      border-radius: var(--radius-md);
+      color: var(--accent-cyan);
+      font-family: 'SFMono-Regular', Consolas, monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid var(--glass-border);
+      white-space: pre-wrap;
+    }
+
+    /* ====== Responsive ====== */
+    @media (max-width: 880px) {
+      .hero { grid-template-columns: 1fr; text-align: center; gap: 30px; }
+      .hero-content p { margin: 0 auto 30px auto; }
+      .hero-visual { display: flex; justify-content: center; }
+      .nav-links { display: none; } /* Simplified for mobile */
+      .about-card { flex-direction: column; text-align: center; padding: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <div class="nav-wrapper">
+    <nav class="nav">
+      <a href="#" class="brand" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+        <div class="logo-box">P</div>
+        <div class="brand-text">
+          <h1>Promptoon</h1>
+          <span>Studio</span>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#works">Karya</a></li>
+        <li><a href="#about">Tentang</a></li>
+        <li><a href="#contact">Kontak</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <button id="themeToggle" class="btn btn-icon ghost" title="Ganti Tema">◐</button>
+        <a href="#works" class="btn primary">Lihat Karya</a>
+      </div>
+    </nav>
+  </div>
+
+  <main class="container">
+    
+    <!-- Hero Section -->
+    <section class="hero reveal">
+      <div class="hero-content">
+        <span class="section-subtitle">✨ AI Animation Library</span>
+        <h2>Ubah Imajinasi Jadi <span class="highlight">Kartun</span></h2>
+        <p>Kumpulan animasi pendek lucu dengan prompt AI lengkap. Salin "mantra" magic-nya dan buat karyamu sendiri.</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content: inherit;">
+          <button class="btn primary" onclick="scrollToId('works')">Eksplorasi Karya 🚀</button>
+          <button class="btn ghost" onclick="scrollToId('about')">Siapa Saya?</button>
+        </div>
+      </div>
+      
+      <!-- Visual Placeholder: User should replace 'src' with their cover image -->
+      <div class="hero-visual">
+        <div class="cover-card">
+          <!-- GANTI SRC INI dengan file persegi panjang Anda (cover.jpg) -->
+          <img src="https://placehold.co/600x400/1a162e/FFF?text=Cover+Image" alt="Promptoon Cover" class="cover-img" id="heroImage">
+          
+          <!-- Badge hiasan -->
+          <div class="float-badge fb-1">🎨 Creative</div>
+          <div class="float-badge fb-2">🤖 AI Powered</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Works Grid -->
+    <section id="works" style="margin-bottom: 80px;">
+      <div class="section-header">
+        <div>
+          <span class="section-subtitle">Galeri</span>
+          <h3 class="section-title">Karya Terbaru</h3>
+        </div>
+      </div>
+
+      <div class="grid" id="grid">
+        <!-- JS will inject cards here -->
+      </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" style="margin-bottom: 80px;">
+      <div class="about-card">
+        <div class="about-bg"></div> <!-- Glow effect -->
+        
+        <div class="profile-img-container">
+          <!-- GANTI SRC INI dengan file lingkaran Anda (profile.jpg) -->
+          <img src="https://placehold.co/200x200/ff4ea4/FFF?text=P" alt="Wahid Amiruddin" class="profile-img" id="profileImage">
+          <div class="profile-star">✨</div>
+        </div>
+        
+        <div class="about-content">
+          <span class="section-subtitle">The Creator</span>
+          <h3 style="margin:0 0 12px 0; font-size:28px;">Wahid Amiruddin</h3>
+          <p style="color:var(--text-muted); line-height:1.6;">
+            Halo! Saya kreator di balik Promptoon. Saya menggabungkan kreativitas, humor lokal, dan teknologi AI untuk membuat animasi pendek yang menghibur. Misi saya sederhana: berbagi prompt agar kamu juga bisa berkarya.
+          </p>
+          <div class="social-links">
+            <a href="https://instagram.com/wachid_amiruddin" target="_blank" class="social-pill">Instagram</a>
+            <a href="https://facebook.com/wahidcucugusdur" target="_blank" class="social-pill">Facebook</a>
+            <a href="#" class="social-pill">YouTube</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" style="margin-bottom: 40px;">
+      <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:40px;">
+        <div>
+          <span class="section-subtitle">Kolaborasi</span>
+          <h3 class="section-title">Punya Ide Seru?</h3>
+          <p style="color:var(--text-muted);">Tertarik request prompt khusus atau ingin bekerja sama? Kirim pesan langsung di sini.</p>
+        </div>
+        
+        <form id="contactForm" onsubmit="event.preventDefault(); sendContact();" style="background:var(--bg-surface); padding:24px; border-radius:20px; border:1px solid var(--glass-border);">
+          <div class="form-group">
+            <input id="nm" class="input-field" placeholder="Nama Kamu" required>
+          </div>
+          <div class="form-group">
+            <input id="em" type="email" class="input-field" placeholder="Alamat Email" required>
+          </div>
+          <div class="form-group">
+            <textarea id="ms" class="input-field" rows="4" placeholder="Pesan..." required></textarea>
+          </div>
+          <button type="submit" class="btn primary" style="width:100%">Kirim Pesan</button>
+        </form>
+      </div>
+    </section>
+
+    <footer style="text-align:center; padding: 40px 0; color:var(--text-muted); font-size:14px; border-top:1px solid var(--glass-border);">
+      © <span id="year"></span> Promptoon. Dibuat dengan ☕ dan AI.
+    </footer>
+
+  </main>
+
+  <!-- Modal -->
+  <div id="modalBackdrop" class="modal-backdrop" onclick="if(event.target===this) closeModal()">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <h3 style="margin:0; font-size:20px;">📜 Magic Prompt</h3>
+        <button class="btn-icon ghost" onclick="closeModal()">✕</button>
+      </div>
+      
+      <div class="prompt-display" id="modalPrompt">Loading...</div>
+      
+      <div style="display:flex; gap:10px; margin-top:20px; justify-content:flex-end;">
+        <button class="btn ghost" onclick="closeModal()">Tutup</button>
+        <button class="btn primary" id="copyModalBtn">Salin Prompt ✨</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // === DATA KARYA (Sama seperti sebelumnya) ===
+    const works = [
+      { id:0, title: "Bagong Ngopi Santai", desc: "Suasana warung kayu saat senja, kopi uap.", thumb: "https://placehold.co/600x400/1a103c/FFF?text=Bagong", prompt: "Create a warm, humorous 2D animation of Bagong (round and funny). Scene: wooden village shack at dusk..." },
+      { id:1, title: "Gareng Bijak", desc: "Gestur bijak & lucu dengan pakaian lurik.", thumb: "https://placehold.co/600x400/1a103c/FFF?text=Gareng", prompt: "2D short animation of Gareng: slightly crooked posture, witty smile, wearing lurik fabric..." },
+      { id:2, title: "Petruk Tertawa", desc: "Petruk terbahak sampai miring, warna cerah.", thumb: "https://placehold.co/600x400/1a103c/FFF?text=Petruk", prompt: "Stylized character animation: Petruk, tall with long nose, exaggerated laugh..." },
+      { id:3, title: "Trio Punokawan", desc: "Kumpul bareng di gubuk bambu.", thumb: "https://placehold.co/600x400/1a103c/FFF?text=Trio", prompt: "Create a warm, humorous scene with Bagong, Gareng, and Petruk seated around a wooden table..." },
+      { id:4, title: "Robot Sawah", desc: "Futuristik dengan pola batik.", thumb: "https://placehold.co/600x400/1a103c/FFF?text=Robot", prompt: "Futuristic agricultural robot assisting in rice terraces, sleek metallic surfaces with batik..." },
+      { id:5, title: "Desa Ghibli", desc: "Pemandangan lembut dan nostalgia.", thumb: "https://placehold.co/600x400/1a103c/FFF?text=Ghibli", prompt: "Ghibli-inspired pastoral scene in Indonesia: cozy wooden house, lush greenery..." }
+    ];
+
+    // === GENERATE GRID ===
+    const grid = document.getElementById('grid');
+    
+    works.forEach((w, idx) => {
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.innerHTML = `
+        <div class="card-img-box">
+          <img src="${w.thumb}" alt="${w.title}" class="card-img" loading="lazy">
+        </div>
+        <div class="card-body">
+          <h4 class="card-title">${w.title}</h4>
+          <p class="card-desc">${w.desc}</p>
+          <div class="prompt-preview" title="Klik untuk lihat full" onclick="openModal(${idx})">
+            ${w.prompt.substring(0, 60)}...
+          </div>
+          <div class="card-actions">
+            <button class="btn-sm btn-outline" onclick="openModal(${idx})">👁 Lihat</button>
+            <button class="btn-sm btn-accent" onclick="copyText('${w.prompt.replace(/'/g, "\\'")}')">📋 Salin</button>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+
+    // === MODAL LOGIC ===
+    const modal = document.getElementById('modalBackdrop');
+    const modalPrompt = document.getElementById('modalPrompt');
+    const copyBtn = document.getElementById('copyModalBtn');
+
+    function openModal(idx) {
+      modalPrompt.textContent = works[idx].prompt;
+      modal.style.display = 'flex';
+      // Trigger reflow for animation
+      setTimeout(() => modal.classList.add('open'), 10);
+      
+      copyBtn.onclick = () => copyText(works[idx].prompt);
+    }
+
+    function closeModal() {
+      modal.classList.remove('open');
+      setTimeout(() => modal.style.display = 'none', 300);
+    }
+
+    // === UTILS ===
+    function copyText(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        const original = btn.innerHTML;
+        btn.innerHTML = "✅ Tersalin!";
+        btn.style.background = "#2ecc71";
+        btn.style.color = "white";
+        setTimeout(() => {
+          btn.innerHTML = original;
+          btn.style.background = "";
+          btn.style.color = "";
+        }, 2000);
+      });
+    }
+
+    function scrollToId(id) {
+      document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function sendContact() {
+      alert("Pesan terkirim! (Demo only)");
+      document.getElementById('contactForm').reset();
+    }
+
+    // === THEME TOGGLE ===
+    const themeBtn = document.getElementById('themeToggle');
+    themeBtn.addEventListener('click', () => {
+      document.documentElement.classList.toggle('light');
+    });
+    
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // === KEYBOARD ESC ===
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape') closeModal();
+    });
+  </script>
+</body>
+</html>
